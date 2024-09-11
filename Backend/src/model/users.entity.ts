@@ -5,17 +5,21 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
-import { Role } from 'src/enums/role.enum';
+import { Role } from 'src/common/role.enum';
 import { Todos } from './todos.entity';
 
 @Entity()
 export class Users {
   @PrimaryGeneratedColumn()
-  userId: number;
+  id: number;
 
   @Column()
   username: string;
+
+  @Column({ unique: true })
+  email: string;
 
   @Column()
   password: string;
@@ -27,7 +31,7 @@ export class Users {
   })
   userType: Role;
 
-  @OneToMany((type) => Todos, (todo) => todo.user)
+  @OneToMany(() => Todos, (todo) => todo.user)
   todos: Todos[];
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -36,9 +40,12 @@ export class Users {
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
-  @Column({ nullable: true })
-  createdBy: string;
+  @Column({ default: false })
+  disabled: boolean;
 
-  @Column({ nullable: true })
-  updatedBy: string;
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt: Date;
+
+  @Column({ type: 'int', nullable: true })
+  deletedBy: number;
 }

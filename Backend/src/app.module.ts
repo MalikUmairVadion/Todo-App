@@ -1,33 +1,20 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Users } from './model/users.entity';
-import { Todos } from './model/todos.entity';
+import { UsersModule } from './module/users.module';
+import { AuthModule } from './module/auth.module';
+import { TodoModule } from './module/todo.module';
+import { getDataSourceOptions } from '../db/data-source';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // Makes config available globally
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT') || 3306,
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
-        entities: [Users, Todos],
-        migrations: ['src/migrations/*.ts'],
-        synchronize: false, //sysnchronize: true shouldn't be used in production - otherwise you can lose production data.
-      }),
-    }),
+    TypeOrmModule.forRoot(getDataSourceOptions()), // Call the function to get DataSourceOptions
     UsersModule,
     AuthModule,
+    TodoModule,
   ],
   controllers: [],
   providers: [],

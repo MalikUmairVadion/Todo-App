@@ -12,35 +12,26 @@ import { Users } from './users.entity';
 @Entity()
 export class Todos {
   @PrimaryGeneratedColumn()
-  todoId: number;
+  id: number;
 
   @Column()
-  todoTitle: string;
+  title: string;
 
   @Column()
-  todoDescription: string;
+  description: string;
 
   @Column({ default: false })
-  todoStatus: boolean;
+  status: boolean;
 
   @ManyToOne(() => Users, (user) => user.todos, { eager: false })
   user: Users;
 
   @CreateDateColumn()
-  todoCreatedDate: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ nullable: true })
-  todoUpdatedDate: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn({ nullable: true })
-  todoDeletedDate: Date;
-
-  @Column({ nullable: true })
-  createdBy: string;
-
-  @Column({ nullable: true })
-  updatedBy: string;
-
-  @Column({ nullable: true })
-  deletedBy: string;
+  deletedAt: Date;
 }
