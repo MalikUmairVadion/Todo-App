@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  ConflictException,
-  HttpStatus,
-  HttpException,
-} from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SignUpDto } from 'src/dto/sign-up.dto';
@@ -18,10 +13,6 @@ export class UsersService {
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
   ) {}
-
-  findAll(): Promise<Users[]> {
-    return this.usersRepository.find();
-  }
 
   findOneByUserName(username: string): Promise<Users | null> {
     return this.usersRepository.findOneBy({ username });
@@ -63,6 +54,7 @@ export class UsersService {
       return {
         statusCode: HttpStatus.CONFLICT,
         message: 'Email already in use',
+        data: null,
       };
     }
 
@@ -154,7 +146,7 @@ export class UsersService {
     try {
       const users = await this.usersRepository.find({
         where: { userType: Role.User },
-        select: ['id', 'username', 'email', 'userType'],
+        select: ['id', 'username', 'email', 'userType', 'disabled'],
       });
 
       return users;

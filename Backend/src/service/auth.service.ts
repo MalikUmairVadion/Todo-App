@@ -3,13 +3,15 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from './users.service';
 import { SignInDto } from 'src/dto/sign-in.dto';
-import { isEmail } from 'class-validator'; // Helper to check if identifier is an email
+import { isEmail } from 'class-validator';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private config: ConfigService,
   ) {}
 
   async signIn(signInDto: SignInDto): Promise<{ access_token: string }> {
@@ -47,9 +49,14 @@ export class AuthService {
       useremail: user.useremail,
       roles: [user.userType],
     };
+    const secret = this.config.get('JWT_CONSTANTS');
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: '36h',
+      secret: secret,
+    });
 
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: token,
     };
   }
 }
