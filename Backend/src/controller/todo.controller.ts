@@ -9,13 +9,16 @@ import {
   Request,
   Param,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from 'src/common/role.enum';
 import { CreateTodoDto } from 'src/dto/create-todo.dto';
 import { UpdateTodoDto } from 'src/dto/update-todo.dto';
 import { Roles } from 'src/roles/roles.decorator';
-import { RolesGuard } from 'src/roles/roles.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
 import { TodoService } from 'src/service/todo.service';
 
+@ApiTags('Todo Management')
+@ApiBearerAuth()
 @Controller('todo')
 @UseGuards(RolesGuard)
 export class TodoController {
@@ -32,11 +35,7 @@ export class TodoController {
   }
 
   @Put(':id')
-  async updateTodo(
-    @Request() req,
-    @Param('id') id: number,
-    @Body() updateTodoDto: UpdateTodoDto,
-  ) {
+  async updateTodo(@Request() req, @Param('id') id: number, @Body() updateTodoDto: UpdateTodoDto) {
     return await this.todoService.updateTodo(req.user.sub, id, updateTodoDto);
   }
 

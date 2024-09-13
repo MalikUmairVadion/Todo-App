@@ -7,7 +7,7 @@ export class CreateTodoDto {
 
   @IsOptional()
   @IsString()
-  description: string;
+  description?: string;
 
   @IsNotEmpty()
   status: boolean = false;

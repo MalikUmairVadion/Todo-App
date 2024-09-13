@@ -37,9 +37,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
     if (user.disabled) {
-      throw new UnauthorizedException(
-        'User is disabled, Kindly contact admin to Enable it first',
-      );
+      throw new UnauthorizedException('User is disabled, Kindly contact admin to Enable it first');
     }
 
     // Generate the JWT payload and token
@@ -47,11 +45,11 @@ export class AuthService {
       sub: user.id,
       username: user.username,
       useremail: user.useremail,
-      roles: [user.userType],
+      roles: user.userType,
     };
     const secret = this.config.get('JWT_CONSTANTS');
     const token = await this.jwtService.signAsync(payload, {
-      expiresIn: '36h',
+      expiresIn: '24h',
       secret: secret,
     });
 

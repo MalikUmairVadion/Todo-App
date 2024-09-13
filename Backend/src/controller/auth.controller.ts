@@ -1,33 +1,18 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Request,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { SignInDto } from '../dto/sign-in.dto';
 import { SkipAuth } from '../guards/SkipAuth.guard';
-import { UsersService } from 'src/service/users.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    private userService: UsersService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @SkipAuth()
   @HttpCode(HttpStatus.OK)
   @Post('login')
   signIn(@Body() signInDto: SignInDto) {
     return this.authService.signIn(signInDto);
-  }
-
-  @Get('me')
-  getProfile(@Request() req) {
-    return this.userService.findOneById(req.user.sub);
   }
 }

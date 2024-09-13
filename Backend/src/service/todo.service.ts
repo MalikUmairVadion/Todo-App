@@ -69,11 +69,7 @@ export class TodoService {
     }
   }
 
-  async updateTodo(
-    userId: number,
-    todoId: number,
-    updateTodoDto: UpdateTodoDto,
-  ): Promise<any> {
+  async updateTodo(userId: number, todoId: number, updateTodoDto: UpdateTodoDto): Promise<any> {
     try {
       const todo = await this.todoRepository.findOne({
         where: { id: todoId, user: { id: userId } },

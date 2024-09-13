@@ -6,6 +6,7 @@ import { Users } from 'src/model/users.entity';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/common/role.enum';
 import { ChangePasswordDto } from 'src/dto/change-password.dto';
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 
 @Injectable()
 export class UsersService {
@@ -30,10 +31,7 @@ export class UsersService {
     });
   }
 
-  async comparePassword(
-    userId: number,
-    inputPassword: string,
-  ): Promise<boolean> {
+  async comparePassword(userId: number, inputPassword: string): Promise<boolean> {
     const user = await this.usersRepository.findOne({
       where: { id: userId },
       select: ['password'],
@@ -80,10 +78,7 @@ export class UsersService {
     };
   }
 
-  async changePassword(
-    userId: number,
-    changePasswordDto: ChangePasswordDto,
-  ): Promise<any> {
+  async changePassword(userId: number, changePasswordDto: ChangePasswordDto): Promise<any> {
     const { oldPassword, newPassword, confirmPassword } = changePasswordDto;
 
     const passwordMatch = await this.comparePassword(userId, oldPassword);
@@ -140,24 +135,34 @@ export class UsersService {
     };
   }
 
-  async getAllUsers(): Promise<
-    { username: string; email: string; userType: Role }[]
-  > {
+  // async getAllUsers(): Promise<{ username: string; email: string; userType: Role }[]> {
+  //   try {
+  //     const users = await this.usersRepository.find({
+  //       where: { userType: Role.User },
+  //       select: ['id', 'username', 'email', 'userType', 'disabled'],
+  //     });
+
+  //     return users;
+  //   } catch (error) {
+  //     // Handle errors
+  //     console.error('Error fetching users:', error);
+
+  //     throw new HttpException('Failed to retrieve users', HttpStatus.INTERNAL_SERVER_ERROR);
+  //   }
+  // }
+
+  async getAllUsers(query: PaginateQuery): Promise<Paginated<Users>> {
     try {
-      const users = await this.usersRepository.find({
+      return paginate(query, this.usersRepository, {
         where: { userType: Role.User },
         select: ['id', 'username', 'email', 'userType', 'disabled'],
+        sortableColumns: ['id', 'username', 'email'],
+        defaultSortBy: [['id', 'ASC']],
+        defaultLimit: 10,
       });
-
-      return users;
     } catch (error) {
-      // Handle errors
       console.error('Error fetching users:', error);
-
-      throw new HttpException(
-        'Failed to retrieve users',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to retrieve users', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
